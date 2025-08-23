@@ -1,0 +1,16 @@
+.body_style{
+    margin: 0px;
+    padding: 0px;
+}
+
+.mainContainer{
+    height: 85vh;
+    overflow: auto;
+}
+
+.listaProductos{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+}
