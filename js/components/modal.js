@@ -1,3 +1,6 @@
+import { getFromLocalStorage, setItemToLocalStorage } from "../storage/storage.js";
+import { contador, setupContador } from "./contador.js";
+
 export function Modal(p) {
   const container = document.querySelector('#productModal');
   if (!container || !p) return;
@@ -31,9 +34,12 @@ export function Modal(p) {
               <div class="col-md-7 text-start">
                 <p class="text-muted">${escapeHtml(p.description || '')}</p>
                 <div class="h5 mb-3">$${formatPrice(p.price)}</div>
-                <button type="button" class="btn btn-success" id="addToCartBtn">
+                <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-3">
+                  <button type="button" class="btn btn-success" id="addToCartBtn">
                   <i class="fas fa-cart-plus me-2"></i> Agregar al carrito
-                </button>
+                  </button>
+                  ${contador(p.id)}
+                </div>
               </div>
             </div>
           </div>
@@ -48,6 +54,29 @@ export function Modal(p) {
   const modalEl = document.getElementById('detalleModal');
   const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
   modal.show();
+
+  setupContador(p.id, 1);
+
+  let addToCartBtn = document.getElementById('addToCartBtn');
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', () => {
+      p.quantity = parseInt(document.getElementById(`valorBtn-${p.id}`)?.textContent) || 1;
+      let cart = getFromLocalStorage();
+      const existingItem = cart.items.find(item => item.id === p.id);
+      if (existingItem) {
+        existingItem.quantity += p.quantity;
+        cart.total += p.price * p.quantity;
+      } else {
+        cart.items.push(p);
+        cart.total += p.price * p.quantity;
+      }
+      setItemToLocalStorage(cart);
+    
+      addToCartBtn.disabled = true;
+      addToCartBtn.innerHTML = '<i class="fas fa-check me-2"></i> Agregado al carrito';
+
+    });
+  }
 }
 
 function formatPrice(n){ const x=Number(n); return Number.isNaN(x)?n:x.toFixed(2); }
