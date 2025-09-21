@@ -15,6 +15,10 @@ export function Modal(p) {
     document.body.style.removeProperty('paddingRight');
   }
 
+  let cart = getFromLocalStorage();
+  const existingItem = cart.items.find(item => item.id === p.id);
+  let quantity = existingItem ? existingItem.quantity : 1;
+
   const template = `
     <div class="modal fade" id="detalleModal" tabindex="-1"
          role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true">
@@ -38,7 +42,7 @@ export function Modal(p) {
                   <button type="button" class="btn btn-success" id="addToCartBtn">
                   <i class="fas fa-cart-plus me-2"></i> Agregar al carrito
                   </button>
-                  ${contador(p.id)}
+                  ${contador(p.id, quantity)}
                 </div>
               </div>
             </div>
@@ -55,16 +59,14 @@ export function Modal(p) {
   const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
   modal.show();
 
-  setupContador(p.id, 1);
+  setupContador(p.id, existingItem?.quantity || 1);
 
   let addToCartBtn = document.getElementById('addToCartBtn');
   if (addToCartBtn) {
     addToCartBtn.addEventListener('click', () => {
       p.quantity = parseInt(document.getElementById(`valorBtn-${p.id}`)?.textContent) || 1;
-      let cart = getFromLocalStorage();
-      const existingItem = cart.items.find(item => item.id === p.id);
       if (existingItem) {
-        existingItem.quantity += p.quantity;
+        existingItem.quantity = p.quantity;
         cart.total += p.price * p.quantity;
       } else {
         cart.items.push(p);
@@ -74,6 +76,11 @@ export function Modal(p) {
     
       addToCartBtn.disabled = true;
       addToCartBtn.innerHTML = '<i class="fas fa-check me-2"></i> Agregado al carrito';
+
+      setTimeout(() => {
+        addToCartBtn.disabled = false;
+        addToCartBtn.innerHTML = '<i class="fas fa-cart-plus me-2"></i> Agregar al carrito';
+      }, 1000);
 
     });
   }

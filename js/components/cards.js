@@ -1,13 +1,17 @@
 import { getProducts } from '../services/api.js';
 import { Modal } from './modal.js';
+import { getFromLocalStorage, setItemToLocalStorage } from "../storage/storage.js";
 
-export function RenderCards() {
+export function RenderCards(filtro = '') {
   const list = document.querySelector('#listaProductos');
   if (!list) return;
 
   getProducts()
     .then((products) => {
       let template = '';
+      if(filtro) {
+        products = products.filter(p => p.title.toLowerCase().includes(filtro.toLowerCase()));
+      }
       products.forEach((p) => {
         template += `
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -37,8 +41,31 @@ export function RenderCards() {
       list.querySelectorAll('button[data-role="add-to-cart"]').forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          console.log('Agregar al carrito (pendiente)');
-        });
+            if (btn) {
+                const id = Number(btn.closest('.product-card').dataset.id);
+                const p = products.find((pp) => pp.id === id);
+                if (!p) return;
+                let cart = getFromLocalStorage();
+                const existingItem = cart.items.find(item => item.id === p.id);
+                if (existingItem) {
+                  existingItem.quantity += 1;
+                  cart.total += p.price * 1;
+                } else {
+                  p.quantity = 1;
+                  cart.items.push(p);
+                  cart.total += p.price * 1;
+                }
+                setItemToLocalStorage(cart);
+              
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-check me-2"></i> Comprando...';
+          
+                setTimeout(() => {
+                  btn.disabled = false;
+                  btn.innerHTML = '<i class="fas fa-cart-plus me-2"></i> Agregar al carrito';
+                }, 1000);
+            }
+        }); 
       });
 
       list.querySelectorAll('.product-card').forEach((cardEl) => {
@@ -46,7 +73,7 @@ export function RenderCards() {
           if (e.key !== 'Enter' && e.key !== ' ') return;
           const active = document.activeElement;
           if (active && active.closest('button[data-role="add-to-cart"]')) return;
-          e.preventDefault();
+          e.preventDefault();   
           const id = Number(cardEl.dataset.id);
           const prod = products.find((pp) => pp.id === id);
           if (prod) Modal(prod);
