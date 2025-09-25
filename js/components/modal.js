@@ -17,7 +17,7 @@ export function Modal(p) {
 
   let cart = getFromLocalStorage();
   const existingItem = cart.items.find(item => item.id === p.id);
-  let quantity = existingItem ? existingItem.quantity : 1;
+  let quantity = existingItem ? existingItem.quantity : 0;
 
   const template = `
     <div class="modal fade" id="detalleModal" tabindex="-1"
