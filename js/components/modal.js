@@ -88,3 +88,67 @@ export function Modal(p) {
 
 function formatPrice(n){ const x=Number(n); return Number.isNaN(x)?n:x.toFixed(2); }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+export function showAboutModal() {
+  const root = document.querySelector('#aboutModalRoot');
+  if (!root) return;
+
+  // Cerrar/limpiar si ya hay uno abierto
+  const existing = document.getElementById('sobreNosotrosModal');
+  if (existing) {
+    const inst = bootstrap.Modal.getInstance(existing);
+    if (inst) inst.hide();
+    existing.remove();
+    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('paddingRight');
+  }
+
+  const template = `
+    <div class="modal fade" id="sobreNosotrosModal" tabindex="-1" aria-labelledby="sobreNosotrosLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content custom-modal">
+          <div class="modal-header">
+            <h5 class="modal-title fw-semibold" id="sobreNosotrosLabel">Sobre nosotros</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-4 align-items-center">
+              <div class="col-md-5">
+                <img class="img-fluid rounded object-fit-cover" src="img/sobre-nosotros.jpg" alt="Nuestro equipo">
+              </div>
+              <div class="col-md-7 text-start">
+                <p class="mb-2">
+                  Somos <strong>E-Compras</strong>, un e-commerce enfocado en darte la mejor experiencia:
+                  productos seleccionados, envíos a todo el país y atención personalizada.
+                </p>
+                <ul class="mb-0">
+                  <li>Envíos rápidos y seguros</li>
+                  <li>Medios de pago flexibles</li>
+                  <li>Soporte posventa</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="goToProductos" class="btn btn-primary">Ver productos</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  root.innerHTML = template;
+
+  const modalEl = document.getElementById('sobreNosotrosModal');
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modal.show();
+
+
+  modalEl.querySelector('#goToProductos')?.addEventListener('click', () => {
+    const inst = bootstrap.Modal.getInstance(modalEl);
+    inst?.hide();
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, { once: true });
+  });
+}
