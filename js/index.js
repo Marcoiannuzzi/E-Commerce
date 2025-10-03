@@ -17,7 +17,11 @@ if (document.readyState === 'loading') {
 } else {
   start();
 
-  document.getElementById('mostrarCarrito').addEventListener('click', mostrarCarrito);
+  document.getElementById('mostrarCarrito').addEventListener('click', (e) => {
+     e.preventDefault();
+    mostrarCarrito();
+  }
+);
 
   document.getElementById('buscador').addEventListener('input', (e) =>
     RenderCards(e.target.value)

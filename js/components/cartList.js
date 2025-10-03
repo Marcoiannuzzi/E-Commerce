@@ -48,7 +48,7 @@ export function renderCartList() {
         <div class="d-flex justify-content-start align-items-start gap-4 my-3">
           <P id="confirmarVaciarCarrito" hidden class="text-danger">¿Estás seguro de que deseas vaciar el carrito?</P>
           <button class="btn btn-success" hidden id="noVaciarCarrito" data-bs-dismiss="modal">Continuar Comprando</button>
-          <button class="btn btn-danger" id="vaciarCarrito">Vaciar Carrito</button>
+          <button class="btn btn-danger" id="vaciarCarrito" onclick=vaciarCarrito();>Vaciar Carrito</button>
         </div>
         <div id="total" >
             <div class="d-flex justify-content-end gap-4 my-3">
@@ -56,7 +56,7 @@ export function renderCartList() {
                 <span class="fw-bold">$${cart.total.toFixed(2)}</span>
             </div>
             </div>    
-            <button id="comprar" type="button" class="btn btn-success" data-bs-dismiss="modal">¡Comprar!</button>
+            <button id="comprar" type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="abrirModalCompraRealizada(${cart.total.toFixed(2)})">¡Comprar!</button>
     </div>
    `;
 
@@ -76,14 +76,8 @@ export function renderCartList() {
   
   document.querySelector("#carritoModal .modal-content").innerHTML = template;
   
-  document.getElementById("comprar").addEventListener("click", () => {
-    abrirModalCompraRealizada(cart.total.toFixed(2));
-  });
-  document.getElementById("vaciarCarrito").addEventListener("click", () => {
-    vaciarCarrito();
-  });
 
-    borrarProductos();
+  borrarProductos();
 }
 
 function borrarProductos() {
